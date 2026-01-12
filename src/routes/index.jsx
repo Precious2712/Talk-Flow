@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
-        errorElement: <NotFound />,
+        // errorElement: <NotFound />,
         children: [
             {
                 index: true,
@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
                 element: <LoginPage />
             },
             {
-                path: 'chat-room',
+                path: '/chat-room',
                 element: <ChatRoom />
             },
             {
@@ -39,7 +39,12 @@ export const router = createBrowserRouter([
                 path: '/group-chat',
                 element: <Group />
             },
-            
+            {
+                path: "*",
+                element: <NotFound />
+            }
+
+
         ],
     },
 ]);
