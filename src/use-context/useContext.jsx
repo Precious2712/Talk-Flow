@@ -22,23 +22,23 @@ export const AppProvider = ({ children }) => {
     const [presence, setPresence] = useState({});
     const [unreadCounts, setUnreadCounts] = useState({});
 
-    /* ================= KEEP REF IN SYNC ================= */
+    
     useEffect(() => {
         selectedUserRef.current = selectedUser;
     }, [selectedUser]);
 
-    /* ================= SOCKET INIT ================= */
+   
     useEffect(() => {
         const stored = JSON.parse(localStorage.getItem("auth"));
         if (!stored) return;
 
-        const socket = io("http://localhost:3000", {
+        const socket = io("https://realtime-chathub.onrender.com", {
             auth: { token: stored.user.token }
         });
 
         socketRef.current = socket;
 
-        /* ---------- PRIVATE MESSAGE ---------- */
+        
         socket.on("private-message", msg => {
             const senderId = msg.from;
             const activeUser = selectedUserRef.current;
@@ -55,7 +55,7 @@ export const AppProvider = ({ children }) => {
                     return [...prev, msg];
                 }
 
-                // Update unread count for this user
+             
                 setUnreadCounts(prevUnread => ({
                     ...prevUnread,
                     [senderId]: (prevUnread[senderId] || 0) + 1
@@ -65,7 +65,7 @@ export const AppProvider = ({ children }) => {
             });
         });
 
-        /* ---------- TYPING ---------- */
+        
         socket.on("typing", ({ from }) => {
             setTypingUser(from);
         });
@@ -74,7 +74,7 @@ export const AppProvider = ({ children }) => {
             setTypingUser(null);
         });
 
-        /* ---------- SEEN CONFIRMATION ---------- */
+        
         socket.on("message-seen", ({ messageId }) => {
             setMessages(prev =>
                 prev.map(m =>
@@ -83,12 +83,11 @@ export const AppProvider = ({ children }) => {
             );
         });
 
-        /* ---------- PRESENCE ---------- */
+       
         socket.on("presence-update", ({ userId, status }) => {
             setPresence(prev => ({ ...prev, [userId]: status }));
         });
 
-        // Initialize unread counts when users load
         socket.on("users", (users) => {
             const initialUnreadCounts = {};
             users.forEach(user => {
@@ -100,12 +99,12 @@ export const AppProvider = ({ children }) => {
         return () => socket.disconnect();
     }, []);
 
-    /* ================= USERS ================= */
+    
     const users = async () => {
-        const res = await axios.get("http://localhost:3000/api/v1/get-users");
+        const res = await axios.get("https://realtime-chathub.onrender.com/api/v1/get-users");
         setClient(res.data.getUser);
 
-        // Initialize unread counts for all users
+        
         const initialUnreadCounts = {};
         res.data.getUser.forEach(user => {
             initialUnreadCounts[user._id] = 0;
@@ -118,7 +117,7 @@ export const AppProvider = ({ children }) => {
         if (!stored) return;
 
         const res = await axios.get(
-            "http://localhost:3000/api/v1/get-current-user",
+            "https://realtime-chathub.onrender.com/api/v1/get-current-user",
             {
                 headers: {
                     Authorization: `Bearer ${stored.user.token}`
@@ -129,12 +128,12 @@ export const AppProvider = ({ children }) => {
         setCurrentUser(res.data);
     };
 
-    /* ================= SELECT USER ================= */
+    
     const handleselectUser = async (user) => {
         setSelectedUser(user);
         setMessages([]);
 
-        // Clear unread badge for this user
+        
         setUnreadCounts(prev => ({
             ...prev,
             [user._id]: 0
@@ -143,7 +142,7 @@ export const AppProvider = ({ children }) => {
         const stored = JSON.parse(localStorage.getItem("auth"));
 
         const res = await axios.get(
-            `http://localhost:3000/api/v1/messages/private/${user._id}`,
+            `https://realtime-chathub.onrender.com/api/v1/messages/private/${user._id}`,
             {
                 headers: {
                     Authorization: `Bearer ${stored.user.token}`
@@ -153,7 +152,7 @@ export const AppProvider = ({ children }) => {
 
         setMessages(res.data);
 
-        // mark fetched messages as seen
+        
         res.data.forEach(msg => {
             if (!msg.seen && msg.sender === user._id) {
                 socketRef.current.emit("message-seen", {
@@ -164,7 +163,7 @@ export const AppProvider = ({ children }) => {
         });
     };
 
-    /* ================= TYPING ================= */
+    
     const sendTyping = () => {
         if (!selectedUser) return;
 
@@ -176,12 +175,12 @@ export const AppProvider = ({ children }) => {
         }, 800);
     };
 
-    /* ================= SEND MESSAGE ================= */
+    
     const sendMessage = (text) => {
         if (!text.trim() || !selectedUser || !currentUser) return;
 
         const tempMessage = {
-            _id: Date.now(), // temporary ID
+            _id: Date.now(),
             message: text,
             sender: currentUser._id,
             receiver: selectedUser._id,
@@ -189,7 +188,7 @@ export const AppProvider = ({ children }) => {
             createdAt: new Date()
         };
 
-        // 🔥 ADD MESSAGE IMMEDIATELY
+        
         setMessages(prev => [...prev, tempMessage]);
 
         socketRef.current.emit("private-message", {
@@ -228,11 +227,12 @@ export const AppProvider = ({ children }) => {
 
 
 
-
     useEffect(() => {
         users();
         checkCurrentUser();
     }, []);
+
+
 
     return (
         <AppContext.Provider

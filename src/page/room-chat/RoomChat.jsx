@@ -8,13 +8,13 @@ const RoomChat = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
 
-    // join room
+    
     useEffect(() => {
         if (!socket) return;
         socket.emit("join-room", { roomId });
     }, [socket, roomId]);
 
-    // listen for room messages
+    
     useEffect(() => {
         if (!socket) return;
 

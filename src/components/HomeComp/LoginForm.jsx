@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function LoginForm() {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ function LoginForm() {
 
         try {
             const res = await fetch(
-                "http://localhost:3000/api/v1/login-user",
+                "https://realtime-chathub.onrender.com/api/v1/login-user",
                 {
                     method: "POST",
                     headers: {
@@ -41,10 +42,13 @@ function LoginForm() {
 
             localStorage.setItem("auth", JSON.stringify(data));
 
+            toast.success('Log in successful');
+
             navigate("/chat-room");
 
         } catch (err) {
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -76,7 +80,7 @@ function LoginForm() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 mt-1 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
@@ -105,9 +109,16 @@ function LoginForm() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium disabled:opacity-60"
+                        className="w-full h-10 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-60"
                     >
-                        {isLoading ? "Logging in..." : "Login"}
+                        {isLoading ? (
+                            <>
+                                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin cursor-pointer" />
+                                Login...
+                            </>
+                        ) : (
+                            "Login"
+                        )}
                     </button>
                 </form>
             </div>

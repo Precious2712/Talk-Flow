@@ -14,14 +14,14 @@ function Home() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link to="/login" className="w-full sm:w-auto">
-                        <button className="w-full px-8 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition">
+                    <Link to="/login" className="w-full cursor-pointer sm:w-auto">
+                        <button className="w-full cursor-pointer px-8 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition">
                             Login
                         </button>
                     </Link>
 
                     <Link to="/signup" className="w-full sm:w-auto">
-                        <button className="w-full px-8 py-3 rounded-lg border border-slate-500 text-white hover:bg-white/10 transition">
+                        <button className="cursor-pointer w-full px-8 py-3 rounded-lg border border-slate-500 text-white hover:bg-white/10 transition">
                             Sign Up
                         </button>
                     </Link>

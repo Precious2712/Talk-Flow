@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
-import { Menu, Users } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Menu, Plus, Users } from "lucide-react";
 import { useAppContext } from "@/use-context/useContext";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const GroupChatRoom = () => {
     const { pendingMember, addMemberToRoom, socket } = useAppContext();
@@ -14,21 +16,21 @@ const GroupChatRoom = () => {
 
     const messagesContainerRef = useRef(null);
 
-    /* ================= AUTO SCROLL ================= */
+
     useEffect(() => {
         if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
     }, [roomMessages]);
 
-    /* ================= FETCH ROOMS ================= */
+
     useEffect(() => {
         const fetchRooms = async () => {
             const stored = JSON.parse(localStorage.getItem("auth"));
             if (!stored) return;
 
             const res = await axios.get(
-                "http://localhost:3000/api/v1/rooms",
+                "https://realtime-chathub.onrender.com/api/v1/rooms",
                 {
                     headers: {
                         Authorization: `Bearer ${stored.user.token}`
@@ -42,7 +44,7 @@ const GroupChatRoom = () => {
         fetchRooms();
     }, []);
 
-    /* ================= LOAD HISTORY + JOIN ROOM ================= */
+    
     useEffect(() => {
         if (!selectedRoom || !socket) return;
 
@@ -51,7 +53,7 @@ const GroupChatRoom = () => {
 
         const loadMessages = async () => {
             const res = await axios.get(
-                `http://localhost:3000/api/v1/messages/room/${selectedRoom._id}`,
+                `https://realtime-chathub.onrender.com/api/v1/messages/room/${selectedRoom._id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${stored.user.token}`
@@ -73,7 +75,7 @@ const GroupChatRoom = () => {
         return () => socket.off("room-message");
     }, [selectedRoom, socket]);
 
-    /* ================= SEND MESSAGE ================= */
+
     const sendMessage = () => {
         if (!text.trim() || !selectedRoom || !socket) return;
 
@@ -85,7 +87,7 @@ const GroupChatRoom = () => {
         setText("");
     };
 
-    /* ================= GET ROOM INITIALS ================= */
+
     const getRoomInitials = (roomName) => {
         if (!roomName) return "";
         const words = roomName.split(" ");
@@ -95,6 +97,20 @@ const GroupChatRoom = () => {
         return roomName.substring(0, 2).toUpperCase();
     };
 
+    const handleAdd = (room) => {
+        if (!pendingMember) {
+            toast.error("No user selected");
+            return;
+        }
+
+        if (room) {
+            toast.success('User added to group');
+        }
+
+        addMemberToRoom(pendingMember, room);
+    };
+
+
     return (
         <div className="bg-gray-900 text-white min-h-screen">
 
@@ -102,22 +118,28 @@ const GroupChatRoom = () => {
             <div className="lg:hidden relative h-screen flex flex-col">
 
                 {/* Header */}
-                <div className="h-14 bg-gray-800 flex items-center gap-4 px-4 z-30 shrink-0 border-b border-gray-700">
-                    <Menu onClick={() => setShowSidebar(true)} className="cursor-pointer" />
+                <div className="h-14 bg-gray-800 flex justify-between items-center gap-4 px-4 z-30 shrink-0 border-b border-gray-700">
+                    <div className="flex gap-2.5">
+                        <Menu onClick={() => setShowSidebar(true)} className="cursor-pointer" />
 
-                    {selectedRoom ? (
-                        <div className="flex flex-col">
-                            <span className="font-semibold leading-tight">
-                                {selectedRoom.roomName}
-                            </span>
-                            <span className="text-xs text-gray-400 flex items-center gap-1">
-                                <Users size={12} />
-                                {selectedRoom.members.length} members
-                            </span>
-                        </div>
-                    ) : (
-                        <span className="font-semibold">Groups</span>
-                    )}
+                        {selectedRoom ? (
+                            <div className="flex flex-col">
+                                <span className="font-semibold leading-tight">
+                                    {selectedRoom.roomName}
+                                </span>
+                                <span className="text-xs text-gray-400 flex items-center gap-1">
+                                    <Users size={12} />
+                                    {selectedRoom.members.length} members
+                                </span>
+                            </div>
+                        ) : (
+                            <span className="font-semibold">Groups</span>
+                        )}
+                    </div>
+
+                    <Link to='/chat-room' className="">
+                        <ArrowLeft />
+                    </Link>
                 </div>
 
                 {/* Sidebar */}
@@ -195,7 +217,7 @@ const GroupChatRoom = () => {
                     )}
                 </div>
 
-                {/* Input */}
+                
                 {selectedRoom && (
                     <div className="bg-gray-800 p-3 border-t border-gray-700 flex gap-2 shrink-0">
                         <input
@@ -217,9 +239,12 @@ const GroupChatRoom = () => {
             {/* ================= DESKTOP ================= */}
             <div className="hidden lg:flex h-screen">
 
-                {/* Sidebar - Fixed with overflow-y auto */}
+               
                 <div className="w-72 bg-gray-800 border-r border-gray-700 flex flex-col shrink-0 fixed left-0 top-0 bottom-0">
-                    <div className="h-14 flex items-center px-4 font-semibold border-b border-gray-700 shrink-0">
+                    <div className="h-14 flex gap-2.5 items-center px-4 font-semibold border-b border-gray-700 shrink-0">
+                        <Link to='/chat-room' className="border border-amber-800 rounded-full flex items-center justify-center bg-gray-800">
+                            <ChevronLeft className="" />
+                        </Link>
                         <span>Rooms</span>
                     </div>
 
@@ -239,6 +264,13 @@ const GroupChatRoom = () => {
                                     <small className="text-gray-400 text-xs">
                                         {room.members.length} members
                                     </small>
+                                </div>
+                                <div className="flex items-center border rounded-full bg-gray-700">
+                                    <Plus
+                                        onClick={() => {
+                                            handleAdd(room);
+                                        }}
+                                        className="w-3 h-3" />
                                 </div>
                             </div>
                         ))}
@@ -272,7 +304,7 @@ const GroupChatRoom = () => {
                     <div className="flex-1 flex justify-center overflow-hidden">
                         <div className="w-160 max-w-full flex flex-col">
 
-                            {/* Messages Container - Fixed with overflow-y auto */}
+                            
                             <div
                                 ref={messagesContainerRef}
                                 className="flex-1 overflow-y-auto px-4 py-4 space-y-3"

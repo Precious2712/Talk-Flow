@@ -1,9 +1,9 @@
 import CreateRoomModal from "@/components/HomeComp/create-room-modal";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/use-context/useContext";
-import { EllipsisVertical, Menu } from "lucide-react";
+import {  Menu, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 export const ChatRoom = () => {
     const [show, setShow] = useState(false);
@@ -31,7 +31,7 @@ export const ChatRoom = () => {
         setPendingMember
     } = useAppContext();
 
-    // Auto-scroll to bottom when new messages arrive
+    
     useEffect(() => {
         if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -50,6 +50,10 @@ export const ChatRoom = () => {
         navigate('/');
     }
 
+    const handleLGroupChat = () => {
+        navigate('/group-chat');
+    }
+
     const statusText = presence[selectedUser?._id] || "offline";
 
     const initials = (u) => `${u.firstName?.[0] || ""}${u.lastName?.[0] || ""}`.toUpperCase();
@@ -64,15 +68,46 @@ export const ChatRoom = () => {
                 <div className="h-14 bg-gray-800 flex items-center justify-between px-4 z-30 shrink-0 border-b border-gray-700">
                     <div className="flex items-center gap-3">
                         <Menu onClick={() => setShow(true)} className="cursor-pointer" />
-                        <span className="font-semibold">
-                            {selectedUser ? selectedUser.firstName : "Select a user"}
-                        </span>
                     </div>
-                    {selectedUser && (
-                        <small className="text-gray-400 text-sm">
-                            {statusText}
-                        </small>
-                    )}
+                    <div className="overflow-x-auto scrollbar-hide">
+                        <div className="flex items-center gap-4 whitespace-nowrap min-w-max px-2">
+                            <div className="flex gap-4">
+                                <span
+                                    onClick={handleLogout}
+                                    className="cursor-pointer text-white px-3 py-2 rounded-md
+                           hover:text-purple-400 hover:bg-white/10
+                           transition-colors duration-200"
+                                >
+                                    Logout
+                                </span>
+
+                                <span
+                                    onClick={() => setIsCreatingRoom(true)}
+                                    className="cursor-pointer text-white px-3 py-2 rounded-md
+                           hover:text-purple-400 hover:bg-white/10
+                           transition-colors duration-200"
+                                >
+                                    Create-room
+                                </span>
+
+                                <span
+                                    onClick={handleLGroupChat}
+                                    className="cursor-pointer text-white px-3 py-2 rounded-md
+                           hover:text-purple-400 hover:bg-white/10
+                           transition-colors duration-200"
+                                >
+                                    Group-chat
+                                </span>
+                            </div>
+
+                            {selectedUser && (
+                                <small className="text-gray-400 text-sm">
+                                    {statusText}
+                                </small>
+                            )}
+                        </div>
+                    </div>
+
                 </div>
 
                 {show && (
@@ -124,7 +159,7 @@ export const ChatRoom = () => {
                     </div>
                 )}
 
-                {/* Messages Area - FIXED with overflow-y-auto */}
+
                 <div
                     ref={messagesContainerRef}
                     className="flex-1 overflow-y-auto px-4 py-3 space-y-3 "
@@ -224,18 +259,18 @@ export const ChatRoom = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="font-medium truncate">{user.firstName} {user.lastName}</div>
-                                    <small onClick={() => {
-                                        setPendingMember(user);
-                                        navigate("/group-chat");
-                                    }} className="text-gray-400 text-xs cursor-pointer">
+                                    <small className="text-gray-400 text-xs cursor-pointer">
                                         {presence[user._id] || "offline"}
                                     </small>
                                 </div>
-                                {unreadCounts[user._id] > 0 && (
-                                    <span className="bg-purple-600 text-white text-xs min-w-5 h-5 px-1 rounded-full flex items-center justify-center font-medium">
-                                        {unreadCounts[user._id]}
-                                    </span>
-                                )}
+                                <div className="flex items-center border rounded-full bg-gray-700">
+                                    <Plus
+                                        onClick={() => {
+                                            setPendingMember(user);
+                                            navigate("/group-chat");
+                                        }}
+                                        className="w-3 h-3" />
+                                </div>
 
                             </div>
                         ))}
@@ -266,12 +301,46 @@ export const ChatRoom = () => {
                             {messages.length} {messages.length === 1 ? 'message' : 'messages'}
                         </div>
                         <div className="flex gap-3">
-                            <Button onClick={handleLogout}>Logout</Button>
-                            <Button onClick={() => setIsCreatingRoom(true)}>
+                            <Button
+                                onClick={handleLogout}
+                                className="
+            px-4 py-2 rounded-md cursor-pointer
+            bg-gray-800 text-gray-200
+            hover:bg-red-600 hover:text-white
+            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900
+            transition-all duration-200
+        "
+                            >
+                                Logout
+                            </Button>
+
+                            <Button
+                                onClick={() => setIsCreatingRoom(true)}
+                                className="
+            px-4 py-2 rounded-md cursor-pointer
+            bg-gray-800 text-gray-200
+            hover:bg-purple-600 hover:text-white
+            focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900
+            transition-all duration-200
+        "
+                            >
                                 Create-room
                             </Button>
 
+                            <Button
+                                onClick={handleLGroupChat}
+                                className="
+            px-4 py-2 rounded-md cursor-pointer
+            bg-gray-800 text-gray-200
+            hover:bg-blue-600 hover:text-white
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900
+            transition-all duration-200
+        "
+                            >
+                                Group-chat
+                            </Button>
                         </div>
+
                     </div>
 
                     <div className="flex-1 flex justify-center overflow-hidden">

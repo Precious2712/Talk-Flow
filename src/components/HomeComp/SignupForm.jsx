@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function SignupForm() {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ function SignupForm() {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/v1/create-user",
+                "https://realtime-chathub.onrender.com/api/v1/create-user",
                 {
                     method: "POST",
                     headers: {
@@ -41,11 +42,12 @@ function SignupForm() {
                 throw new Error(data.message || "Signup failed");
             }
 
-            // ✅ SUCCESS → GO TO LOGIN
             navigate("/login");
+            toast.success('Account created');
 
         } catch (err) {
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -53,7 +55,7 @@ function SignupForm() {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
+            
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold text-white">Create account</h1>
                 <p className="text-slate-400">
@@ -61,7 +63,7 @@ function SignupForm() {
                 </p>
             </div>
 
-            {/* Form Card */}
+            
             <div className="bg-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-xl border border-white/10 shadow-lg">
                 <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -69,7 +71,7 @@ function SignupForm() {
                         <p className="text-red-400 text-sm">{error}</p>
                     )}
 
-                    {/* Name Row */}
+                   
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-white">
@@ -81,7 +83,7 @@ function SignupForm() {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full px-3 py-2 mt-1 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
 
@@ -95,12 +97,12 @@ function SignupForm() {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full px-3 py-2 mt-1 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
                     </div>
 
-                    {/* Email */}
+                    
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-white">
                             Email Address
@@ -111,11 +113,11 @@ function SignupForm() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 mt-1 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
-                    {/* Password */}
+                   
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-white">
                             Password
@@ -126,19 +128,19 @@ function SignupForm() {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 mt-1 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
-                    {/* Submit */}
+                   
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-60"
+                        className="w-full h-10 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-60"
                     >
                         {isLoading ? (
                             <>
-                                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin cursor-pointer" />
                                 Creating account...
                             </>
                         ) : (
@@ -148,7 +150,7 @@ function SignupForm() {
                 </form>
             </div>
 
-            {/* Footer */}
+            
             <p className="text-center text-slate-400">
                 Already have an account?{" "}
                 <Link
