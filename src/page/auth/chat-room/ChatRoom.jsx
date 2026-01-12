@@ -1,9 +1,9 @@
 import CreateRoomModal from "@/components/HomeComp/create-room-modal";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/use-context/useContext";
-import {  Menu, Plus } from "lucide-react";
+import { Menu, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const ChatRoom = () => {
     const [show, setShow] = useState(false);
@@ -31,7 +31,7 @@ export const ChatRoom = () => {
         setPendingMember
     } = useAppContext();
 
-    
+
     useEffect(() => {
         if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -231,6 +231,16 @@ export const ChatRoom = () => {
                         </button>
                     </div>
                 )}
+
+                {isCreatingRoom && (
+                    <CreateRoomModal
+                        onClose={() => {
+                            setIsCreatingRoom(false);
+                            setRoomMembers([]);
+                        }}
+                    />
+                )}
+
             </div>
 
             {/* ================= DESKTOP ================= */}
